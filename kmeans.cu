@@ -79,7 +79,7 @@ __global__ void ComputeCentroids(Cluster *clusters, Point *tempPoints)
 
 __global__ void RepeatNeeded(Point *points, Point *tempPoints, unsigned int *key)
 {
-    int pt = blockIdx.x*blockDim.x + threadIdx.x;
+    int pt = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (pt < N) {
         if (points[pt].clusterId != tempPoints[pt].clusterId) {

@@ -1,7 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#define N 1000000
+#define N 100000
 #define K 10
 
 #ifdef DEBUG
