@@ -10,11 +10,10 @@
 
 enum {
     X_AXIS,
-    Y_AXIS,
-    ///DIMENSIONS,
+    Y_AXIS
 };
 
-#define DIMENSIONS 200 
+#define DIMENSIONS 200
 
 #define SQUARE(x) ((x)*(x))
 #define MOD(x) (((x) >= 0) ? (x) : (-(x)))
@@ -30,13 +29,13 @@ typedef struct {
 } Cluster;
 
 
-static double GetDistance(Point p1, Point p2) 
+static double GetDistance(Point p1, Point p2)
 {
     return sqrt(SQUARE(p2.loc[X_AXIS]-p1.loc[X_AXIS])+SQUARE(p2.loc[Y_AXIS]-p1.loc[Y_AXIS]));
 }
 
-#if defined (GPU) || defined (GPU_KD)
-static __device__ double GetDistanceGPU(Point p1, Point p2) 
+#if defined (GPU)
+static __device__ double GetDistanceGPU(Point p1, Point p2)
 {
     return sqrt(SQUARE(p2.loc[X_AXIS]-p1.loc[X_AXIS])+SQUARE(p2.loc[Y_AXIS]-p1.loc[Y_AXIS]));
 }
