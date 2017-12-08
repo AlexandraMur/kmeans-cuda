@@ -43,7 +43,7 @@ __global__ void ComputeClusters(Point *points, Cluster *clusters, Point *tempPoi
         return;
 
     // Save the old centroid and clear the x and y components of
-    // each point. We're going to use first K of these to store
+    // each point. I'm going to use first K of these to store
     // the sum of co-ordinates of points in this cluster.
     // clusterId field is used to save old centroid for each point
     // so that we know when to stop iterating.
@@ -61,7 +61,7 @@ __global__ void ComputeClusters(Point *points, Cluster *clusters, Point *tempPoi
         }
     }
     atomicAdd(&clusters[inCluster].noOfPoints, 1);
-    // Bottle neck I'm sure.
+    // Bottle neck.
     atomicAdd(&tempPoints[inCluster].loc[X_AXIS], points[pt].loc[X_AXIS]);
     atomicAdd(&tempPoints[inCluster].loc[Y_AXIS], points[pt].loc[Y_AXIS]);
 
@@ -105,7 +105,7 @@ void DoKmeansGPU (Point *points, Cluster *clusters)
     cudaMemcpy(dPoints, points, sizeof(Point)*N, cudaMemcpyHostToDevice);
     cudaMemcpy(dClusters, clusters, sizeof(Cluster)*K, cudaMemcpyHostToDevice);
 
-    dim3 threadsPerBlock (256);
+    dim3 threadsPerBlock(256);
     dim3 blocksPerGrid (N / threadsPerBlock.x);
 
     do {
@@ -160,7 +160,7 @@ void DoKmeansCPU (Point *points, Cluster *clusters)
             for (j = 0; j < K; j++) {
                 if (GetDistance(points[i], clusters[j].pt) < max) {
                     inCluster = j;
-                    // TODO: We should next store these distances, instead of re-computing
+                    // TODO: Store these distances, instead of re-computing
                     // (I don't mean from above call, I mean totally for the program).
                     max = GetDistance(points[i], clusters[j].pt);
                 }

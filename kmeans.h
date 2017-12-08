@@ -1,5 +1,5 @@
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef KMEANS_H
+#define KMEANS_H
 
 #define N 100000
 #define K 10
