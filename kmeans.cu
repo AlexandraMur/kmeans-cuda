@@ -11,7 +11,7 @@
 
 #if defined GPU
 // From the NVIDIA CUDA programming guide. No idea how it works
-__device__ double atomicAdd(double* address, double val)
+__device__ double atomicAdd(double *address, double val)
 {
     double old = *address, assumed;
     do {
@@ -34,8 +34,10 @@ __global__ void ResetCentroidForEachCluster(Cluster *clusters)
 
 __global__ void ComputeClusters(Point *points, Cluster *clusters, Point *tempPoints)
 {
-    int pt = blockIdx.x*blockDim.x + threadIdx.x;
-    int i; double max; int inCluster;
+    int pt = blockIdx.x * blockDim.x + threadIdx.x;
+    int i;
+    double max;
+    int inCluster;
 
     if (pt >= N)
         return;
@@ -91,9 +93,9 @@ __global__ void RepeatNeeded(Point *points, Point *tempPoints, unsigned int *key
 
 void DoKmeansGPU (Point *points, Cluster *clusters)
 {
-
     Point *dPoints, *dTempPoints;
-    Cluster *dClusters; unsigned int *repeat, repeatHost;
+    Cluster *dClusters;
+    unsigned int *repeat, repeatHost;
 
     cudaMalloc ((void **)&dPoints, sizeof(Point)*N);
     cudaMalloc ((void **)&dClusters, sizeof(Cluster)*K);
@@ -104,14 +106,17 @@ void DoKmeansGPU (Point *points, Cluster *clusters)
     cudaMemcpy(dClusters, clusters, sizeof(Cluster)*K, cudaMemcpyHostToDevice);
 
     dim3 threadsPerBlock (256);
-    dim3 blocksPerGrid (N/threadsPerBlock.x);
+    dim3 blocksPerGrid (N / threadsPerBlock.x);
 
     do {
-        ResetCentroidForEachCluster<<<blocksPerGrid, threadsPerBlock>>>(dClusters);
-        ComputeClusters<<<blocksPerGrid, threadsPerBlock>>>(dPoints, dClusters, dTempPoints);
-        ComputeCentroids<<<blocksPerGrid, threadsPerBlock>>>(dClusters, dTempPoints);
+        ResetCentroidForEachCluster <<< blocksPerGrid, threadsPerBlock >>> (dClusters);
+        ComputeClusters <<< blocksPerGrid, threadsPerBlock >>> (dPoints, dClusters, dTempPoints);
+        ComputeCentroids <<< blocksPerGrid, threadsPerBlock >>> (dClusters, dTempPoints);
+
         cudaMemset(repeat, 0, sizeof(unsigned int));
-        RepeatNeeded<<<blocksPerGrid, threadsPerBlock>>>(dPoints, dTempPoints, repeat);
+
+        RepeatNeeded <<<blocksPerGrid, threadsPerBlock >>> (dPoints, dTempPoints, repeat);
+
         cudaMemcpy(&repeatHost, repeat, sizeof(unsigned int), cudaMemcpyDeviceToHost);
     } while (repeatHost);
 
