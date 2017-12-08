@@ -205,8 +205,8 @@ int main (int argc, char *argv[])
 
     srandom(time(NULL));
 
-    pointsCPU = (Point *) malloc (sizeof(Point)*N);
-    clustersCPU = (Cluster *) malloc (sizeof(Cluster)*K);
+    pointsCPU = (Point *) malloc(sizeof(Point)*N);
+    clustersCPU = (Cluster *) malloc(sizeof(Cluster)*K);
 
     // Get the points randomly
     for (i = 0; i < N; i++) {
@@ -232,11 +232,11 @@ int main (int argc, char *argv[])
 #ifdef DEBUG
     printf ("Initial points:\n");
     for (i = 0; i < N; i++) {
-        printf ("x=%.2f,y=%.2f,clusterId=%d\n", pointsCPU[i].loc[X_AXIS], pointsCPU[i].loc[Y_AXIS], pointsCPU[i].clusterId);
+        printf ("x=%.2f, y=%.2f, clusterId=%d\n", pointsCPU[i].loc[X_AXIS], pointsCPU[i].loc[Y_AXIS], pointsCPU[i].clusterId);
     }
     printf ("Initial clusters:\n");
     for (i = 0; i < K; i++) {
-        printf("clusterId=%d,noOfPoints=%d,centroidX=%.2f,centroidY=%.2f\n", clustersCPU[i].pt.clusterId,
+        printf("clusterId=%d, noOfPoints=%d, centroidX=%.2f, centroidY=%.2f\n", clustersCPU[i].pt.clusterId,
                clustersCPU[i].noOfPoints, clustersCPU[i].pt.loc[X_AXIS], clustersCPU[i].pt.loc[Y_AXIS]);
     }
 #endif // DEBUG
@@ -292,23 +292,3 @@ int main (int argc, char *argv[])
 
     return 0;
 }
-
-#if 0
-/********** Pretty print script ***********
-// string=""
-// for plot in /tmp/*.plot
-// do
-//     string="${string},\"$plot\""
-// done
-//
-// string=`cut -c 2- <<EOF
-/  $string
-// EOF`
-//
-// echo "set key off" > /tmp/plot
-// echo "plot $string" >> /tmp/plot
-// gnuplot -persist < /tmp/plot
-//
-// # ah
-************** End script ****************/
-#endif
