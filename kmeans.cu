@@ -249,8 +249,8 @@ int main (int argc, char *argv[])
     printf("%f seconds on GPU.\n", tval());
 #endif
 
-    // Note plain CPU should always be at the end. Data for other versions are
-    // copied from here. So don't want it to change before copying.
+    // Data for other versions are copied from here. So don't want it
+    // to change before copying.
     tstart();
     DoKmeansCPU(pointsCPU, clustersCPU);
     tend();
@@ -307,4 +307,3 @@ int main (int argc, char *argv[])
 // # ah
 ************** End script ****************/
 #endif
-
