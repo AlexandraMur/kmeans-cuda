@@ -13,7 +13,7 @@ enum {
     Y_AXIS
 };
 
-#define DIMENSIONS 200
+#define DIMENSIONS 2
 
 #define SQUARE(x) ((x)*(x))
 #define MOD(x) (((x) >= 0) ? (x) : (-(x)))
