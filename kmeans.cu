@@ -10,8 +10,8 @@
 #include "kmeans.h"
 
 #if defined GPU
-// From the NVIDIA CUDA programming guide.
-__device__ double atomicAdd(double* address, double val)
+// From the NVIDIA CUDA programming guide. No idea how it works
+__device__ double atomicAdd(double *address, double val)
 {
     double old = *address, assumed;
     do {
@@ -34,14 +34,16 @@ __global__ void ResetCentroidForEachCluster(Cluster *clusters)
 
 __global__ void ComputeClusters(Point *points, Cluster *clusters, Point *tempPoints)
 {
-    int pt = blockIdx.x*blockDim.x + threadIdx.x;
-    int i; double max; int inCluster;
+    int pt = blockIdx.x * blockDim.x + threadIdx.x;
+    int i;
+    double max;
+    int inCluster;
 
     if (pt >= N)
         return;
 
     // Save the old centroid and clear the x and y components of
-    // each point. We're going to use first K of these to store
+    // each point. I'm going to use first K of these to store
     // the sum of co-ordinates of points in this cluster.
     // clusterId field is used to save old centroid for each point
     // so that we know when to stop iterating.
@@ -59,7 +61,7 @@ __global__ void ComputeClusters(Point *points, Cluster *clusters, Point *tempPoi
         }
     }
     atomicAdd(&clusters[inCluster].noOfPoints, 1);
-    // Bottle neck I'm sure.
+    // Bottle neck.
     atomicAdd(&tempPoints[inCluster].loc[X_AXIS], points[pt].loc[X_AXIS]);
     atomicAdd(&tempPoints[inCluster].loc[Y_AXIS], points[pt].loc[Y_AXIS]);
 
@@ -79,7 +81,7 @@ __global__ void ComputeCentroids(Cluster *clusters, Point *tempPoints)
 
 __global__ void RepeatNeeded(Point *points, Point *tempPoints, unsigned int *key)
 {
-    int pt = blockIdx.x*blockDim.x + threadIdx.x;
+    int pt = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (pt < N) {
         if (points[pt].clusterId != tempPoints[pt].clusterId) {
@@ -91,9 +93,9 @@ __global__ void RepeatNeeded(Point *points, Point *tempPoints, unsigned int *key
 
 void DoKmeansGPU (Point *points, Cluster *clusters)
 {
-
     Point *dPoints, *dTempPoints;
-    Cluster *dClusters; unsigned int *repeat, repeatHost;
+    Cluster *dClusters;
+    unsigned int *repeat, repeatHost;
 
     cudaMalloc ((void **)&dPoints, sizeof(Point)*N);
     cudaMalloc ((void **)&dClusters, sizeof(Cluster)*K);
@@ -103,15 +105,18 @@ void DoKmeansGPU (Point *points, Cluster *clusters)
     cudaMemcpy(dPoints, points, sizeof(Point)*N, cudaMemcpyHostToDevice);
     cudaMemcpy(dClusters, clusters, sizeof(Cluster)*K, cudaMemcpyHostToDevice);
 
-    dim3 threadsPerBlock (256);
-    dim3 blocksPerGrid (N/threadsPerBlock.x);
+    dim3 threadsPerBlock(256);
+    dim3 blocksPerGrid (N / threadsPerBlock.x);
 
     do {
-        ResetCentroidForEachCluster<<<blocksPerGrid, threadsPerBlock>>>(dClusters);
-        ComputeClusters<<<blocksPerGrid, threadsPerBlock>>>(dPoints, dClusters, dTempPoints);
-        ComputeCentroids<<<blocksPerGrid, threadsPerBlock>>>(dClusters, dTempPoints);
+        ResetCentroidForEachCluster <<< blocksPerGrid, threadsPerBlock >>> (dClusters);
+        ComputeClusters <<< blocksPerGrid, threadsPerBlock >>> (dPoints, dClusters, dTempPoints);
+        ComputeCentroids <<< blocksPerGrid, threadsPerBlock >>> (dClusters, dTempPoints);
+
         cudaMemset(repeat, 0, sizeof(unsigned int));
-        RepeatNeeded<<<blocksPerGrid, threadsPerBlock>>>(dPoints, dTempPoints, repeat);
+
+        RepeatNeeded <<<blocksPerGrid, threadsPerBlock >>> (dPoints, dTempPoints, repeat);
+
         cudaMemcpy(&repeatHost, repeat, sizeof(unsigned int), cudaMemcpyDeviceToHost);
     } while (repeatHost);
 
@@ -140,7 +145,6 @@ void DoKmeansCPU (Point *points, Cluster *clusters)
     do {
 
         memset(tempPoints, 0, sizeof(Point)*N);
-NVIDIA
         for (i = 0; i < K; i++) {
             clusters[i].noOfPoints = 0;
         }
@@ -155,7 +159,7 @@ NVIDIA
             for (j = 0; j < K; j++) {
                 if (GetDistance(points[i], clusters[j].pt) < max) {
                     inCluster = j;
-                    // TODO: We should next store these distances, instead of re-computing
+                    // TODO: Store these distances, instead of re-computing
                     // (I don't mean from above call, I mean totally for the program).
                     max = GetDistance(points[i], clusters[j].pt);
                 }
@@ -200,8 +204,8 @@ int main (int argc, char *argv[])
 
     srandom(time(NULL));
 
-    pointsCPU = (Point *) malloc (sizeof(Point)*N);
-    clustersCPU = (Cluster *) malloc (sizeof(Cluster)*K);
+    pointsCPU = (Point *) malloc(sizeof(Point)*N);
+    clustersCPU = (Cluster *) malloc(sizeof(Cluster)*K);
 
     // Get the points randomly
     for (i = 0; i < N; i++) {
@@ -227,11 +231,11 @@ int main (int argc, char *argv[])
 #ifdef DEBUG
     printf ("Initial points:\n");
     for (i = 0; i < N; i++) {
-        printf ("x=%.2f,y=%.2f,clusterId=%d\n", pointsCPU[i].loc[X_AXIS], pointsCPU[i].loc[Y_AXIS], pointsCPU[i].clusterId);
+        printf ("x=%.2f, y=%.2f, clusterId=%d\n", pointsCPU[i].loc[X_AXIS], pointsCPU[i].loc[Y_AXIS], pointsCPU[i].clusterId);
     }
     printf ("Initial clusters:\n");
     for (i = 0; i < K; i++) {
-        printf("clusterId=%d,noOfPoints=%d,centroidX=%.2f,centroidY=%.2f\n", clustersCPU[i].pt.clusterId,
+        printf("clusterId=%d, noOfPoints=%d, centroidX=%.2f, centroidY=%.2f\n", clustersCPU[i].pt.clusterId,
                clustersCPU[i].noOfPoints, clustersCPU[i].pt.loc[X_AXIS], clustersCPU[i].pt.loc[Y_AXIS]);
     }
 #endif // DEBUG
@@ -249,8 +253,8 @@ int main (int argc, char *argv[])
     printf("%f seconds on GPU.\n", tval());
 #endif
 
-    // Note plain CPU should always be at the end. Data for other versions are
-    // copied from here. So don't want it to change before copying.
+    // Data for other versions are copied from here. So don't want it
+    // to change before copying.
     tstart();
     DoKmeansCPU(pointsCPU, clustersCPU);
     tend();
@@ -287,23 +291,3 @@ int main (int argc, char *argv[])
 
     return 0;
 }
-
-#if 0
-/********** Pretty print script ***********
-// string=""
-// for plot in /tmp/*.plot
-// do
-//     string="${string},\"$plot\""
-// done
-//
-// string=`cut -c 2- <<EOF
-/  $string
-// EOF`
-//
-// echo "set key off" > /tmp/plot
-// echo "plot $string" >> /tmp/plot
-// gnuplot -persist < /tmp/plot
-//
-// # ah
-************** End script ****************/
-#endif
