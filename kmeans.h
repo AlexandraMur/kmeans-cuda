@@ -26,15 +26,33 @@ typedef struct {
 } Cluster;
 
 
+/*typedef struct {
+  int points[DIMENSIONS][N];
+  int clusterId[N];
+} Points;
+*/
+
 static double GetDistance(Point p1, Point p2)
 {
-    return sqrt(SQUARE(p2.loc[X_AXIS]-p1.loc[X_AXIS]) + SQUARE(p2.loc[Y_AXIS]-p1.loc[Y_AXIS]));
+    double distance = 0;
+
+    for (int i=0; i < DIMENSIONS; i++) {
+      distance += SQUARE(p2.loc[i] - p1.loc[i])
+    }
+
+    return sqrt(distance);
 }
 
 #if defined (GPU)
 static __device__ double GetDistanceGPU(Point p1, Point p2)
 {
-    return sqrt(SQUARE(p2.loc[X_AXIS]-p1.loc[X_AXIS]) + SQUARE(p2.loc[Y_AXIS]-p1.loc[Y_AXIS]));
+    double distance = 0;
+
+    for (int i=0; i < DIMENSIONS; i++) {
+      distance += SQUARE(p2.loc[i] - p1.loc[i])
+    }
+
+    return sqrt(distance);
 }
 #endif
 
