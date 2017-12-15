@@ -209,8 +209,9 @@ int main (int argc, char *argv[])
 
     // Get the points randomly
     for (i = 0; i < N; i++) {
-        pointsCPU[i].loc[X_AXIS] = (random()/1021322);
-        pointsCPU[i].loc[Y_AXIS] = (random()/1021322);
+        for (int d=0; i < DIMENSIONS; d++) {
+          pointsCPU[i].loc[d] = (random()/1021322);
+        }
         pointsCPU[i].clusterId = -1;
     }
 
