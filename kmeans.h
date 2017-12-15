@@ -1,8 +1,8 @@
 #ifndef KMEANS_H
 #define KMEANS_H
 
-#define N 100000
-#define K 10
+#define N 10
+#define K 2
 
 #ifdef DEBUG
 #define NDEBUG
