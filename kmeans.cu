@@ -10,7 +10,7 @@
 #include "kmeans.h"
 
 #if defined GPU
-// From the NVIDIA CUDA programming guide. No idea how it works
+// From the NVIDIA CUDA programming guide.
 __device__ double atomicAdd(double* address, double val)
 {
     double old = *address, assumed;
@@ -140,7 +140,7 @@ void DoKmeansCPU (Point *points, Cluster *clusters)
     do {
 
         memset(tempPoints, 0, sizeof(Point)*N);
-
+NVIDIA
         for (i = 0; i < K; i++) {
             clusters[i].noOfPoints = 0;
         }
@@ -307,4 +307,3 @@ int main (int argc, char *argv[])
 // # ah
 ************** End script ****************/
 #endif
-
