@@ -49,7 +49,7 @@ __global__ void ComputeClusters(Point *points, Cluster *clusters, Point *tempPoi
     // so that we know when to stop iterating.
     tempPoints[pt].clusterId = points[pt].clusterId;
 
-    for (int j=0; j < DIMENSIONS; j++) {}
+    for (int j=0; j < DIMENSIONS; j++) {
         tempPoints[pt].loc[j] = 0.0;
     }
 
