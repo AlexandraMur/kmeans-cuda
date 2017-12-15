@@ -10,7 +10,7 @@
 
 #define X_AXIS 0
 #define Y_AXIS 1
-#define DIMENSIONS 2
+#define DIMENSIONS 10
 
 #define SQUARE(x) ((x)*(x))
 #define MOD(x) (((x) >= 0) ? (x) : (-(x)))
