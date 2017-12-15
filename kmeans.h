@@ -37,7 +37,7 @@ static double GetDistance(Point p1, Point p2)
     double distance = 0;
 
     for (int i=0; i < DIMENSIONS; i++) {
-      distance += SQUARE(p2.loc[i] - p1.loc[i])
+      distance += SQUARE(p2.loc[i] - p1.loc[i]);
     }
 
     return sqrt(distance);
@@ -49,7 +49,7 @@ static __device__ double GetDistanceGPU(Point p1, Point p2)
     double distance = 0;
 
     for (int i=0; i < DIMENSIONS; i++) {
-      distance += SQUARE(p2.loc[i] - p1.loc[i])
+      distance += SQUARE(p2.loc[i] - p1.loc[i]);
     }
 
     return sqrt(distance);
