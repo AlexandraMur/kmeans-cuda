@@ -209,11 +209,8 @@ int main (int argc, char *argv[])
 
     // Get the points randomly
     for (i = 0; i < N; i++) {
-        printf("\n##### 1 #####\n");
         for (int d=0; d < DIMENSIONS; d++) {
-          printf("\n##### 2 #####\n");
           pointsCPU[i].loc[d] = (random()/1021322);
-          printf("\n##### 3 #####\n");
         }
         pointsCPU[i].clusterId = -1;
     }
