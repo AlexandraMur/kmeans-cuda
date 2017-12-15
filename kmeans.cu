@@ -48,8 +48,10 @@ __global__ void ComputeClusters(Point *points, Cluster *clusters, Point *tempPoi
     // clusterId field is used to save old centroid for each point
     // so that we know when to stop iterating.
     tempPoints[pt].clusterId = points[pt].clusterId;
-    tempPoints[pt].loc[X_AXIS] = 0.0;
-    tempPoints[pt].loc[Y_AXIS] = 0.0;
+
+    for (int j=0; j < DIMENSIONS; j++) {}
+        tempPoints[pt].loc[j] = 0.0;
+    }
 
     // Compute the nearest centroid.
     max = GetDistanceGPU(points[pt], clusters[0].pt);
@@ -62,8 +64,9 @@ __global__ void ComputeClusters(Point *points, Cluster *clusters, Point *tempPoi
     }
     atomicAdd(&clusters[inCluster].noOfPoints, 1);
     // Bottle neck.
-    atomicAdd(&tempPoints[inCluster].loc[X_AXIS], points[pt].loc[X_AXIS]);
-    atomicAdd(&tempPoints[inCluster].loc[Y_AXIS], points[pt].loc[Y_AXIS]);
+    for (int j=0; j < DIMENSIONS; j++) {
+      atomicAdd(&tempPoints[inCluster].loc[j], points[pt].loc[j]);
+    }
 
     points[pt].clusterId = inCluster;
 }
@@ -74,8 +77,9 @@ __global__ void ComputeCentroids(Cluster *clusters, Point *tempPoints)
 
     // Now calculate the new centroids.
     if (pt < K) {
-        clusters[pt].pt.loc[X_AXIS] = tempPoints[pt].loc[X_AXIS]/clusters[pt].noOfPoints;
-        clusters[pt].pt.loc[Y_AXIS] = tempPoints[pt].loc[Y_AXIS]/clusters[pt].noOfPoints;
+      for (int j=0; j<DIMENSIONS; j++) {
+        clusters[pt].pt.loc[j] = tempPoints[pt].loc[j]/clusters[pt].noOfPoints;
+      }
     }
 }
 
@@ -165,8 +169,10 @@ void DoKmeansCPU (Point *points, Cluster *clusters)
                 }
             }
             clusters[inCluster].noOfPoints++;
-            tempPoints[inCluster].loc[X_AXIS] += points[i].loc[X_AXIS];
-            tempPoints[inCluster].loc[Y_AXIS] += points[i].loc[Y_AXIS];
+
+            for (intj=0; j < DIMENSIONS; j++) {
+              tempPoints[inCluster].loc[j] += points[i].loc[j];
+            }
             points[i].clusterId = inCluster;
         }
 
@@ -174,8 +180,10 @@ void DoKmeansCPU (Point *points, Cluster *clusters)
         for (i = 0; i < K; i++) {
             // Assuming that each cluster has atleast one point in it.
             assert(clusters[i].noOfPoints != 0);
-            clusters[i].pt.loc[X_AXIS] = tempPoints[i].loc[X_AXIS]/clusters[i].noOfPoints;
-            clusters[i].pt.loc[Y_AXIS] = tempPoints[i].loc[Y_AXIS]/clusters[i].noOfPoints;
+
+            for (int j=0; j < DIMENSIONS; j++) {
+                clusters[i].pt.loc[j] = tempPoints[i].loc[j]/clusters[i].noOfPoints;
+            }
         }
 
         // Check if anything has changed
@@ -225,8 +233,10 @@ int main (int argc, char *argv[])
             // Potential infinite loop
         }
         pointsCPU[j].clusterId = i;
-        clustersCPU[i].pt.loc[X_AXIS] = pointsCPU[j].loc[X_AXIS];
-        clustersCPU[i].pt.loc[Y_AXIS] = pointsCPU[j].loc[Y_AXIS];
+
+        for(int d=0; d < DIMENSIONS; d++) {
+            clustersCPU[i].pt.loc[d] = pointsCPU[j].loc[d];
+        }
     }
 
 #ifdef DEBUG
