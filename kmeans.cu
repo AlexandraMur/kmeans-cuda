@@ -232,7 +232,10 @@ int main (int argc, char *argv[])
 #ifdef DEBUG
     printf ("Initial points:\n");
     for (i = 0; i < N; i++) {
-        printf ("x=%.2f, y=%.2f, clusterId=%d\n", pointsCPU[i].loc[X_AXIS], pointsCPU[i].loc[Y_AXIS], pointsCPU[i].clusterId);
+        for(int j=0; j < DIMENSIONS; j++) {
+            printf("%.2f ", pointsCPU[i].loc[j]);
+        }
+        printf ("| clusterId=%d\n", pointsCPU[i].clusterId);
     }
     printf ("Initial clusters:\n");
     for (i = 0; i < K; i++) {
