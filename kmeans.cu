@@ -170,7 +170,7 @@ void DoKmeansCPU (Point *points, Cluster *clusters)
             }
             clusters[inCluster].noOfPoints++;
 
-            for (intj=0; j < DIMENSIONS; j++) {
+            for (int j=0; j < DIMENSIONS; j++) {
               tempPoints[inCluster].loc[j] += points[i].loc[j];
             }
             points[i].clusterId = inCluster;
